@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let API_URI = "http://localhost:9001";
+    </script>
+
+    <!-- setup of socket io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+    </script>
+
+    <!-- user ui for register -->
+    <div>
+      <h1>Register user</h1>
+      <input type="text" placeholder="enter  user name" id="username" /> <br />
+      <br />
+      <input type="number" placeholder="enter user latitude" id="userlat" />
+      <br />
+      <br />
+      <input type="number" placeholder="enter  user longitude" id="userlon" />
+      <br />
+      <br />
+      <button onclick="registerUser()">Register User</button>
+      <hr />
+      <hr />
+    </div>
+
+    <!-- driver ui for register -->
+    <div>
+      <h1>Register driver</h1>
+      <input type="text" placeholder="enter driver name" id="drivername" />
+      <br />
+      <br />
+      <input type="number" placeholder="enter driver latitude" id="driverlat" />
+      <br />
+      <br />
+      <input
+        type="number"
+        placeholder="enter driver longitude"
+        id="driverlon"
+      />
+      <br />
+      <br />
+      <input
+        type="string"
+        placeholder="enter your vehicle type"
+        id="drivercar"
+      />
+      <br />
+      <br />
+      <button onclick="registerDriver()">Register Driver</button>
+      <hr />
+      <hr />
+    </div>
+
+    <!-- here user check for near by driver ui -->
+    <div>
+      <h1>Here user check for driver</h1>
+
+      <input
+        type="text"
+        placeholder="enter your ID"
+        id="usercurrID"
+        value="65d32327902e5a4f39936b19"
+      />
+      <br />
+      <br />
+      <input
+        type="number"
+        placeholder="enter current latitude"
+        id="usercurrlat"
+      />
+      <br />
+      <br />
+      <input
+        type="number"
+        placeholder="enter current longitude"
+        id="usercurrlon"
+      />
+      <br />
+      <br />
+      <input type="string" placeholder="enter  vehicle type" id="vehicletype" />
+      <br />
+      <br />
+      <button onclick="findDriver()">Find Driver</button>
+      <hr />
+      <hr />
+    </div>
+
+    <!-- Here driver put there id to get login-->
+    <div>
+      <h1>Here driver put their id to get login</h1>
+
+      <input
+        type="text"
+        placeholder="enter driver ID"
+        id="drivercurrID"
+        value="65d3233d902e5a4f39936b1b"
+      />
+
+      <p>For bike use thisdriver ID to login 65d32602297fc91b62fca997</p>
+      <br />
+      <br />
+      <!-- <input type="number" placeholder="enter latitude" id="drivercurrlat" /> -->
+      <!-- <br /> -->
+      <!-- <br /> -->
+      <!-- <input type="number" placeholder="enter longitude" id="drivercurrlon" /> -->
+      <!-- <br /> -->
+      <!-- <br /> -->
+
+      <!-- <button onclick="findUser()">Find User</button> -->
+      <hr />
+      <hr />
+    </div>
+
+    <!-- chat box -->
+    <div>
+      <hr />
+      <hr />
+      <div>
+        <input type="text" id="message" /><br /><br />
+        <button onclick="sendMessage()">sendMessage</button>
+        <div id="all_messages"></div>
+      </div>
+    </div>
+
+    <!-- get socketID HERE -->
+    <script>
+      // get socket id
+      var SOCKETID;
+      socket.on("socketID", (socketID) => {
+        SOCKETID = socketID;
+        console.log("your socket id is ====>>>>", SOCKETID);
+      });
+    </script>
+
+    <!-- user  register here -->
+    <script>
+      const username = document.getElementById("username");
+      const userlat = document.getElementById("userlat");
+      const userlon = document.getElementById("userlon");
+
+      const registerUser = async () => {
+        userData = {
+          name: username.value,
+          lat: userlat.value,
+          lon: userlon.value,
+        };
+        console.log("registerUser", userData);
+
+        let result = await fetch(`${API_URI}/userRegister`, {
+          method: "POST",
+          body: JSON.stringify(userData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        result = await result.json();
+        console.log({ result: result.resp });
+      };
+    </script>
+
+    <!-- Driver Register here -->
+    <script>
+      const drivername = document.getElementById("drivername");
+      const driverlat = document.getElementById("driverlat");
+      const driverlon = document.getElementById("driverlon");
+      const drivercar = document.getElementById("drivercar");
+
+      const registerDriver = async () => {
+        driverData = {
+          name: drivername.value,
+          lat: driverlat.value,
+          lon: driverlon.value,
+          vehicleType: drivercar.value,
+        };
+        console.log("asfdasfdas", driverData);
+
+        let result = await fetch(`${API_URI}/driverRegister`, {
+          method: "POST",
+          body: JSON.stringify(driverData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        result = await result.json();
+        console.log({ result: result.resp });
+      };
+    </script>
+
+    <!-- find nearby driver -->
+    <script>
+      const usercurrID = document.getElementById("usercurrID");
+      const usercurrlat = document.getElementById("usercurrlat");
+      const usercurrlon = document.getElementById("usercurrlon");
+      const requireVehicle = document.getElementById("vehicletype");
+
+      const findDriver = async () => {
+        findDriverData = {
+          lat: usercurrlat.value,
+          lon: usercurrlon.value,
+          vehicleType: requireVehicle.value,
+        };
+        console.log("findDriverData= ========>>>", findDriverData);
+
+        let result = await fetch(`${API_URI}/findDriver`, {
+          method: "PUT",
+          body: JSON.stringify(findDriverData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        result = await result.json();
+        console.log({ result: result.resp });
+
+        //user data
+
+        let userData = {
+          lat: usercurrlat.value,
+          lon: usercurrlon.value,
+          driverList: result.resp,
+          userID: usercurrID.value,
+          userSOCKETID: SOCKETID,
+        };
+
+        socket.emit("findDriver", userData);
+      };
+
+      socket.on("driverStatus", (rideDetail) => {
+        console.log("driverStatus===============>", rideDetail);
+        console.log("accept status", rideDetail.rideAccepted);
+        if (rideDetail.rideAccepted) {
+          alert(`your ride is accepted by driver ${rideDetail.DRIVERID}`);
+
+          // here driver accepted the ride so below code will statrt the chat betwen them
+          socket.emit("chatData", rideDetail);
+        }
+      });
+    </script>
+
+    <!-- find nearby user -->
+    <script>
+      const drivercurrlat = document.getElementById("drivercurrlat");
+      const drivercurrlon = document.getElementById("drivercurrlon");
+      var drivercurrID = document.getElementById("drivercurrID");
+      const findUser = async () => {
+        findUserData = {
+          lat: drivercurrlat.value,
+          lon: drivercurrlon.value,
+        };
+        console.log("asfdasfdas", findUserData);
+
+        let result = await fetch(`${API_URI}/findUser`, {
+          method: "PUT",
+          body: JSON.stringify(findUserData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        result = await result.json();
+        console.log({ result: result.resp });
+      };
+    </script>
+
+    <!-- accept ride socket will be delevered to all bcz socket to logic not applied -->
+    <script>
+      socket.on("acceptRide", (userData) => {
+        console.log("acceptRide===================>", userData);
+        console.log("driver curr ID is ========>", drivercurrID.value);
+        let driverList = userData.driverList;
+        var USERLAT = userData.lat;
+        var USERLON = userData.lon;
+        var USERID = userData.userID;
+        var userSOCKETID = userData.userSOCKETID;
+        var driverSOCKETID = SOCKETID;
+
+        for (driver of driverList) {
+          console.log("acceptRide===================>", driver._id);
+
+          if (drivercurrID.value == driver._id) {
+            console.log(`driver id match =  ${true}`);
+            let rideAccepted = window.confirm(
+              `you got  ride of userID ${USERID}\n lat is ${USERLAT} \n lon is ${USERLON} \n do you want to confirm this`
+            );
+
+            let rideDetail = {
+              USERID,
+              DRIVERID: drivercurrID.value,
+              rideAccepted,
+              userSOCKETID,
+              driverSOCKETID,
+            };
+            if (rideAccepted) {
+              console.log(`Ride accepted >>>>> ${true} `);
+              socket.emit("rideStatus", rideDetail);
+              //now send your socket id so that one you establish connection between the user
+            } else {
+              console.log(`Ride accepted >>>>> ${false}`);
+              socket.emit("rideStatus", rideDetail);
+            }
+          }
+        }
+      });
+    </script>
+
+    <!-- chat functionalit -->
+    <script>
+      var rideDetailforchat;
+      socket.on("chatStart", (rideDetail) => {
+        rideDetailforchat = rideDetail;
+        console.log("chat start ========>>>", rideDetail);
+
+        //RECEIVING MESSAGES
+
+        socket.on("messagesReceived", (messageData) => {
+          console.log("messagesReceived =======>>>>>>", messageData);
+
+          //  print message
+          const p = document.createElement("p");
+          p.textContent = messageData.message;
+
+          const div = document.getElementById("all_messages");
+          div.appendChild(p);
+          console.log(message.value);
+          message.value = "";
+        });
+      });
+      // SENDING MESSAGES
+      let message = document.getElementById("message");
+      const sendMessage = () => {
+        while (message.value == "") {
+          alert("enter message");
+          return;
+        }
+        let messageData = {
+          message: message.value,
+          userSOCKETID: rideDetailforchat.userSOCKETID,
+          driverSOCKETID: rideDetailforchat.driverSOCKETID,
+        };
+
+        socket.emit("messageSend", messageData);
+      };
+    </script>
+  </body>
+</html>
+<!-- 
+  lat: 28.561959251384163
+  long: 77.28273070153669
+ -->
