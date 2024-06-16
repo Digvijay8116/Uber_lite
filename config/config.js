@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const MONGO_URI =
-  "mongodb+srv://Digvijay:Test123@cluster0.hv2anhk.mongodb.net/Uber_?retryWrites=true&w=majority";
+const MONGO_URI = "mongodb://localhost:27017/Uber_";
 
 mongoose
   .connect(MONGO_URI)
